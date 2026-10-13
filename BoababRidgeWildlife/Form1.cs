@@ -185,5 +185,153 @@ namespace BoababRidgeWildlife
                 MessageBox.Show("Please select an entire row to delete.", "Selection Required", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
+
+        private void btnSearch_Click(object sender, EventArgs e)
+        {
+            string searchId = txtSearchID.Text.Trim();
+
+            if (string.IsNullOrWhiteSpace(searchId))
+            {
+                MessageBox.Show("Please enter an Animal ID to search.", "Search", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            bool found = false;
+            foreach (DataGridViewRow row in dataGridView1.Rows)
+            {
+                if (row.Cells["ID"].Value != null &&
+                    row.Cells["ID"].Value.ToString().Trim().Equals(searchId, StringComparison.OrdinalIgnoreCase))
+                {
+                    row.Selected = true;
+                    dataGridView1.CurrentCell = row.Cells[0];
+
+                    txtAnimalIDInput.Text = row.Cells["ID"].Value?.ToString() ?? "";
+                    txtNameInput.Text = row.Cells["Name"].Value?.ToString() ?? "";
+                    txtSpeciesInput.Text = row.Cells["Species"].Value?.ToString() ?? "";
+                    txtAgeInput.Text = row.Cells["Age"].Value?.ToString() ?? "";
+                    txtRecoveryScoreInput.Text = row.Cells["Score"].Value?.ToString() ?? "";
+
+                    txtAnimalIDInput.ReadOnly = true;
+                    btnSaveChanges.Enabled = true;
+                    btnAdd.Enabled = false;
+
+                    found = true;
+                    break;
+                }
+            }
+
+            if (!found)
+            {
+                MessageBox.Show($"No animal found with ID '{searchId}'.", "Not Found", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+        }
+
+        private void btnSaveChanges_Click(object sender, EventArgs e)
+        {
+            string targetID = txtAnimalIDInput.Text.Trim();
+            string name = txtNameInput.Text.Trim();
+            string species = txtSpeciesInput.Text.Trim();
+            string ageText = txtAgeInput.Text.Trim();
+            string scoreText = txtRecoveryScoreInput.Text.Trim();
+
+            if (string.IsNullOrWhiteSpace(name) || string.IsNullOrWhiteSpace(species) ||
+                string.IsNullOrWhiteSpace(ageText) || string.IsNullOrWhiteSpace(scoreText))
+            {
+                MessageBox.Show("Please fill in all fields before updating.", "Validation Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            if (name.Length < 1 || name.Length > 30 || name.Contains('|') || name.Any(char.IsDigit))
+            {
+                MessageBox.Show("Name must be 1–30 characters and cannot contain numbers or '|'.", "Invalid Name", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtNameInput.Focus();
+                return;
+            }
+
+            if (species.Length < 1 || species.Length > 30 || species.Contains('|') || species.Any(char.IsDigit))
+            {
+                MessageBox.Show("Species must be 1–30 characters and cannot contain numbers or '|'.", "Invalid Species", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtSpeciesInput.Focus();
+                return;
+            }
+
+            if (!int.TryParse(ageText, out int age) || age < 0 || age > 100)
+            {
+                MessageBox.Show("Age must be a valid whole number (0-100).", "Invalid Age", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            if (!int.TryParse(scoreText, out int recoveryScore) || recoveryScore < 0 || recoveryScore > 100)
+            {
+                MessageBox.Show("Recovery score must be a whole number between 0 and 100.", "Invalid Score", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            Animal.Classify(recoveryScore, out string status, out string housingUnit);
+            string updatedRecord = $"{targetID} | {name} | {species} | {age} | {recoveryScore} | {status} | {housingUnit}";
+
+            try
+            {
+                string[] lines = File.ReadAllLines(filePath);
+                using (StreamWriter writer = new StreamWriter(filePath, false))
+                {
+                    foreach (string line in lines)
+                    {
+                        if (string.IsNullOrWhiteSpace(line)) continue;
+
+                        string[] parts = line.Split('|');
+                        if (parts.Length > 0 && parts[0].Trim().Equals(targetID, StringComparison.OrdinalIgnoreCase))
+                        {
+                            writer.WriteLine(updatedRecord);
+                        }
+                        else
+                        {
+                            writer.WriteLine(line);
+                        }
+                    }
+                }
+
+                LoadAnimalsData();
+                btnClear_Click(null, null);
+                MessageBox.Show("Animal record updated successfully!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch (IOException)
+            {
+                MessageBox.Show("Could not update the file. Ensure it is not locked by another process.", "File Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void btnClear_Click(object sender, EventArgs e)
+        {
+            txtSearchID.Clear();
+            txtAnimalIDInput.Clear();
+            txtNameInput.Clear();
+            txtSpeciesInput.Clear();
+            txtAgeInput.Clear();
+            txtRecoveryScoreInput.Clear();
+
+            txtAnimalIDInput.ReadOnly = false;
+            btnSaveChanges.Enabled = false;
+            btnAdd.Enabled = true;
+            dataGridView1.ClearSelection();
+        }
+
+        private void dataGridView1_CellClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex >= 0 && e.RowIndex < dataGridView1.Rows.Count)
+            {
+                DataGridViewRow row = dataGridView1.Rows[e.RowIndex];
+
+                txtAnimalIDInput.Text = row.Cells["ID"].Value?.ToString() ?? "";
+                txtNameInput.Text = row.Cells["Name"].Value?.ToString() ?? "";
+                txtSpeciesInput.Text = row.Cells["Species"].Value?.ToString() ?? "";
+                txtAgeInput.Text = row.Cells["Age"].Value?.ToString() ?? "";
+                txtRecoveryScoreInput.Text = row.Cells["Score"].Value?.ToString() ?? "";
+
+                txtAnimalIDInput.ReadOnly = true;
+                btnSaveChanges.Enabled = true;
+                btnAdd.Enabled = false;
+            }
+        }
     }
 }

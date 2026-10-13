@@ -42,6 +42,11 @@
             textBox6 = new TextBox();
             dataGridView1 = new DataGridView();
             btnDelete = new Button();
+            label1 = new Label();
+            btnSearch = new Button();
+            btnSaveChanges = new Button();
+            btnClear = new Button();
+            txtSearchID = new TextBox();
             ((System.ComponentModel.ISupportInitialize)dataGridView1).BeginInit();
             SuspendLayout();
             // 
@@ -162,6 +167,7 @@
             dataGridView1.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             dataGridView1.Size = new Size(502, 576);
             dataGridView1.TabIndex = 12;
+            dataGridView1.CellClick += dataGridView1_CellClick;
             // 
             // btnDelete
             // 
@@ -173,11 +179,62 @@
             btnDelete.UseVisualStyleBackColor = true;
             btnDelete.Click += btnDelete_Click;
             // 
+            // label1
+            // 
+            label1.AutoSize = true;
+            label1.Location = new Point(166, 87);
+            label1.Name = "label1";
+            label1.Size = new Size(79, 20);
+            label1.TabIndex = 14;
+            label1.Text = "Search ID: ";
+            // 
+            // btnSearch
+            // 
+            btnSearch.Location = new Point(166, 110);
+            btnSearch.Name = "btnSearch";
+            btnSearch.Size = new Size(94, 29);
+            btnSearch.TabIndex = 15;
+            btnSearch.Text = "Search";
+            btnSearch.UseVisualStyleBackColor = true;
+            btnSearch.Click += btnSearch_Click;
+            // 
+            // btnSaveChanges
+            // 
+            btnSaveChanges.Location = new Point(222, 485);
+            btnSaveChanges.Name = "btnSaveChanges";
+            btnSaveChanges.Size = new Size(172, 29);
+            btnSaveChanges.TabIndex = 16;
+            btnSaveChanges.Text = "Save Changes";
+            btnSaveChanges.UseVisualStyleBackColor = true;
+            btnSaveChanges.Click += btnSaveChanges_Click;
+            // 
+            // btnClear
+            // 
+            btnClear.Location = new Point(222, 520);
+            btnClear.Name = "btnClear";
+            btnClear.Size = new Size(172, 29);
+            btnClear.TabIndex = 17;
+            btnClear.Text = "Clear";
+            btnClear.UseVisualStyleBackColor = true;
+            btnClear.Click += btnClear_Click;
+            // 
+            // txtSearchID
+            // 
+            txtSearchID.Location = new Point(155, 145);
+            txtSearchID.Name = "txtSearchID";
+            txtSearchID.Size = new Size(125, 27);
+            txtSearchID.TabIndex = 18;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(914, 600);
+            Controls.Add(txtSearchID);
+            Controls.Add(btnClear);
+            Controls.Add(btnSaveChanges);
+            Controls.Add(btnSearch);
+            Controls.Add(label1);
             Controls.Add(btnDelete);
             Controls.Add(dataGridView1);
             Controls.Add(textBox6);
@@ -216,5 +273,10 @@
         private TextBox textBox6;
         private DataGridView dataGridView1;
         private Button btnDelete;
+        private Label label1;
+        private Button btnSearch;
+        private Button btnSaveChanges;
+        private Button btnClear;
+        private TextBox txtSearchID;
     }
 }
