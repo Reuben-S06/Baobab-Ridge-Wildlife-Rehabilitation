@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace BoababRidgeWildlife
 {
-    internal class Animal
+    public class Animal
     {
         public string AnimalID { get; set; }
         public string Name { get; set; }
@@ -16,14 +16,28 @@ namespace BoababRidgeWildlife
         public string Status { get; set; }
         public string HousingUnit { get; set; }
 
-        public Animal (string animalID, string name, string species, int age, int recoveryScore, string status, string housingUnit)
+        public Animal() { }
+
+        public Animal(string animalID, string name, string species, int age, int recoveryScore)
         {
             AnimalID = animalID;
             Name = name;
             Species = species;
             Age = age;
             RecoveryScore = recoveryScore;
+
             Classify(recoveryScore, out string calculatedStatus, out string calculatedHousing);
+            Status = calculatedStatus;
+            HousingUnit = calculatedHousing;
+        }
+
+        public Animal(string animalID, string name, string species, int age, int recoveryScore, string status, string housingUnit)
+        {
+            AnimalID = animalID;
+            Name = name;
+            Species = species;
+            Age = age;
+            RecoveryScore = recoveryScore;
             Status = status;
             HousingUnit = housingUnit;
         }
