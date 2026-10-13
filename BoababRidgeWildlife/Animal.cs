@@ -16,16 +16,17 @@ namespace BoababRidgeWildlife
         public string Status { get; set; }
         public string HousingUnit { get; set; }
 
-        public Animal (string animalID, string name, string species, int age, int recoveryScore, string status, string housingUnit)
+        public Animal(string animalId, string name, string species, int age, int recoveryScore)
         {
-            AnimalID = animalID;
+            AnimalID = animalId;
             Name = name;
             Species = species;
             Age = age;
             RecoveryScore = recoveryScore;
+
             Classify(recoveryScore, out string calculatedStatus, out string calculatedHousing);
-            Status = status;
-            HousingUnit = housingUnit;
+            Status = calculatedStatus;
+            HousingUnit = calculatedHousing;
         }
 
         public static void Classify(int score, out string status, out string housingUnit)
