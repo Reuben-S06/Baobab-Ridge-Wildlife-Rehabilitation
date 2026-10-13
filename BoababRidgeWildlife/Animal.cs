@@ -1,12 +1,12 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BaobabRidgeWildlife
+namespace BoababRidgeWildlife
 {
-    internal class Animal
+    public class Animal
     {
         public string AnimalID { get; set; }
         public string Name { get; set; }
@@ -16,8 +16,9 @@ namespace BaobabRidgeWildlife
         public string Status { get; set; }
         public string HousingUnit { get; set; }
 
-        public Animal(string animalID, string name, string species,
-                      int age, int recoveryScore)
+        public Animal() { }
+
+        public Animal(string animalID, string name, string species, int age, int recoveryScore)
         {
             AnimalID = animalID;
             Name = name;
@@ -25,7 +26,18 @@ namespace BaobabRidgeWildlife
             Age = age;
             RecoveryScore = recoveryScore;
 
-            Classify(recoveryScore, out string status, out string housingUnit);
+            Classify(recoveryScore, out string calculatedStatus, out string calculatedHousing);
+            Status = calculatedStatus;
+            HousingUnit = calculatedHousing;
+        }
+
+        public Animal(string animalID, string name, string species, int age, int recoveryScore, string status, string housingUnit)
+        {
+            AnimalID = animalID;
+            Name = name;
+            Species = species;
+            Age = age;
+            RecoveryScore = recoveryScore;
             Status = status;
             HousingUnit = housingUnit;
         }
@@ -37,22 +49,22 @@ namespace BaobabRidgeWildlife
                 status = "Critical";
                 housingUnit = "Intensive Care Unit";
             }
-            else if (score <= 39)
+            else if (score >= 20 && score <= 39)
             {
                 status = "Serious";
                 housingUnit = "High-Dependency Ward";
             }
-            else if (score <= 59)
+            else if (score >= 40 && score <= 59)
             {
                 status = "Stable";
                 housingUnit = "Recovery Ward";
             }
-            else if (score <= 79)
+            else if (score >= 60 && score <= 79)
             {
                 status = "Recovering";
                 housingUnit = "Outdoor Enclosure";
             }
-            else if (score <= 100)
+            else if (score >= 80 && score <= 100)
             {
                 status = "Release-Ready";
                 housingUnit = "Pre-Release Camp";
@@ -62,6 +74,11 @@ namespace BaobabRidgeWildlife
                 status = "Unknown";
                 housingUnit = "Unknown";
             }
+        }
+
+        public override string ToString()
+        {
+            return $"{AnimalID} | {Name} | {Species} | {Age} | {RecoveryScore} | {Status} | {HousingUnit}";
         }
     }
 }
