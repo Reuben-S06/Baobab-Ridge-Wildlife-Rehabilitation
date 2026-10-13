@@ -49,18 +49,34 @@ namespace BoababRidgeWildlife
                 return;
             }
 
-            // Validate name and species
-            if (name.Any(char.IsDigit) || species.Any(char.IsDigit))
+            // Validate name
+            if (name.Length < 1 || name.Length > 30 || name.Contains('|'))
             {
-                MessageBox.Show("Name and species cannot contain numbers.",
-                    "Invalid Information",
+                MessageBox.Show(
+                    "Name must be 1–30 characters and cannot contain |.",
+                    "Invalid Name",
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Warning);
+
+                txtNameInput.Focus();
+                return;
+            }
+
+            // Validate species
+            if (species.Length < 1 || species.Length > 30 || species.Contains('|'))
+            {
+                MessageBox.Show(
+                    "Species must be 1–30 characters and cannot contain |.",
+                    "Invalid Species",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
+
+                txtSpeciesInput.Focus();
                 return;
             }
 
             // Validate age
-            if (!int.TryParse(ageText, out int age) || age < 0)
+            if (!int.TryParse(ageText, out int age) || age < 0 || age > 100)
             {
                 MessageBox.Show("Age must be a valid non-negative whole number.",
                     "Invalid Age",
@@ -98,7 +114,13 @@ namespace BoababRidgeWildlife
             Animal.Classify(recoveryScore, out string status, out string housingUnit);
 
             // Create the animal record
-            Animal animal = new Animal(animalID, name, species, age, recoveryScore);
+            Animal animal = new Animal(
+
+                animalID,
+                name,
+                species,
+                age,
+                recoveryScore);
 
             // Save the record using the required pipe-separated format
             string record = $"{animal.AnimalID}|{animal.Name}|{animal.Species}|{animal.Age}|{animal.RecoveryScore}|{status}|{housingUnit}";
