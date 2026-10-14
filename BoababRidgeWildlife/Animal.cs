@@ -25,54 +25,32 @@ namespace BoababRidgeWildlife
             Species = species;
             Age = age;
             RecoveryScore = recoveryScore;
-
-            Classify(recoveryScore, out string calculatedStatus, out string calculatedHousing);
-            Status = calculatedStatus;
-            HousingUnit = calculatedHousing;
-        }
-
-        public Animal(string animalID, string name, string species, int age, int recoveryScore, string status, string housingUnit)
-        {
-            AnimalID = animalID;
-            Name = name;
-            Species = species;
-            Age = age;
-            RecoveryScore = recoveryScore;
+            Classify(recoveryScore, out string status, out string housingUnit);
             Status = status;
             HousingUnit = housingUnit;
         }
 
         public static void Classify(int score, out string status, out string housingUnit)
         {
-            if (score >= 0 && score <= 19)
+            if (score >= 1 && score <= 50)
             {
                 status = "Critical";
-                housingUnit = "Intensive Care Unit";
+                housingUnit = "ICU";
             }
-            else if (score >= 20 && score <= 39)
-            {
-                status = "Serious";
-                housingUnit = "High-Dependency Ward";
-            }
-            else if (score >= 40 && score <= 59)
+            else if (score >= 51 && score <= 79)
             {
                 status = "Stable";
-                housingUnit = "Recovery Ward";
-            }
-            else if (score >= 60 && score <= 79)
-            {
-                status = "Recovering";
-                housingUnit = "Outdoor Enclosure";
+                housingUnit = "General Ward";
             }
             else if (score >= 80 && score <= 100)
             {
-                status = "Release-Ready";
-                housingUnit = "Pre-Release Camp";
+                status = "Ready for Release";
+                housingUnit = "Pre-Release Enclosure";
             }
             else
             {
                 status = "Unknown";
-                housingUnit = "Unknown";
+                housingUnit = "Quarantine";
             }
         }
 
