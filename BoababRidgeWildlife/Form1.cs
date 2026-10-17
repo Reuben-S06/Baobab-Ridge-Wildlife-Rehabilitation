@@ -1,6 +1,6 @@
 using System;
 using System.Drawing;
-
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
@@ -17,8 +17,12 @@ namespace BoababRidgeWildlife
             LoadAnimalsData();
         }
 
+        // Loads animal records from animals.txt
         private void LoadAnimalsData()
         {
+            try
+            {
+
             if (!File.Exists(filePath))
             {
                 using (File.Create(filePath)) { }
@@ -55,7 +59,25 @@ namespace BoababRidgeWildlife
                 }
             }
         }
+            catch (IOException)
+            {
+                MessageBox.Show(
+                    "animals.txt could not be accessed because the file is currently in use.",
+                    "File Error",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+            }
+            catch (UnauthorizedAccessException)
+            {
+                MessageBox.Show(
+                    "The application does not have permission to access animals.txt.",
+                    "Permission Error",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+            }
+        }
 
+        // Adds a new animal record
         private void btnAdd_Click(object sender, EventArgs e)
         {
             string animalID = txtAnimalIDInput.Text.Trim();
@@ -146,9 +168,12 @@ namespace BoababRidgeWildlife
             }
         }
 
+        // Deletes the selected animal record
         private void btnDelete_Click(object sender, EventArgs e)
         {
-            if (dataGridView1.SelectedRows.Count > 0)
+            try
+            {
+                if (dataGridView1.SelectedRows.Count > 0)
             {
                 string selectedID = dataGridView1.SelectedRows[0].Cells["ID"].Value?.ToString() ?? "";
                 string selectedName = dataGridView1.SelectedRows[0].Cells["Name"].Value?.ToString() ?? "";
@@ -183,6 +208,23 @@ namespace BoababRidgeWildlife
             else
             {
                 MessageBox.Show("Please select an entire row to delete.", "Selection Required", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+        }
+            catch (IOException)
+            {
+                MessageBox.Show(
+                    "The animal record could not be deleted because animals.txt is currently in use.",
+                    "File Error",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+            }
+            catch (UnauthorizedAccessException)
+            {
+                MessageBox.Show(
+                    "The application does not have permission to modify animals.txt.",
+                    "Permission Error",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
             }
         }
 
@@ -226,6 +268,7 @@ namespace BoababRidgeWildlife
             }
         }
 
+        // Updates the selected animal record
         private void btnSaveChanges_Click(object sender, EventArgs e)
         {
             string targetID = txtAnimalIDInput.Text.Trim();
@@ -299,6 +342,14 @@ namespace BoababRidgeWildlife
             {
                 MessageBox.Show("Could not update the file. Ensure it is not locked by another process.", "File Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+            catch (UnauthorizedAccessException)
+            {
+                MessageBox.Show(
+                    "The application does not have permission to modify animals.txt.",
+                    "Permission Error",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+            }
         }
 
         private void btnClear_Click(object sender, EventArgs e)
@@ -331,6 +382,145 @@ namespace BoababRidgeWildlife
                 txtAnimalIDInput.ReadOnly = true;
                 btnSaveChanges.Enabled = true;
                 btnAdd.Enabled = false;
+            }
+        }
+
+        private void btnGenerateSummary_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                int totalAnimals = 0;
+                int totalAge = 0;
+                int totalRecoveryScore = 0;
+
+                int criticalCount = 0;
+                int seriousCount = 0;
+                int stableCount = 0;
+                int recoveringCount = 0;
+                int releaseReadyCount = 0;
+
+                if (File.Exists(filePath))
+                {
+                    string[] lines = File.ReadAllLines(filePath);
+
+                    foreach (string line in lines)
+                    {
+                        if (string.IsNullOrWhiteSpace(line))
+                            continue;
+
+                        string[] parts = line.Split('|');
+
+                        if (parts.Length != 7)
+                            continue;
+
+                        if (!int.TryParse(parts[3].Trim(), out int age))
+                            continue;
+
+                        if (!int.TryParse(parts[4].Trim(), out int recoveryScore))
+                            continue;
+
+                        string status = parts[5].Trim();
+
+                        totalAnimals++;
+                        totalAge += age;
+                        totalRecoveryScore += recoveryScore;
+
+                        switch (status)
+                        {
+                            case "Critical":
+                                criticalCount++;
+                                break;
+
+                            case "Serious":
+                                seriousCount++;
+                                break;
+
+                            case "Stable":
+                                stableCount++;
+                                break;
+
+                            case "Recovering":
+                                recoveringCount++;
+                                break;
+
+                            case "Release-Ready":
+                                releaseReadyCount++;
+                                break;
+                        }
+                    }
+                }
+
+                string averageAge;
+                string averageRecoveryScore;
+
+                if (totalAnimals == 0)
+                {
+                    averageAge = "N/A";
+                    averageRecoveryScore = "N/A";
+                }
+                else
+                {
+                    averageAge = ((double)totalAge / totalAnimals)
+                        .ToString("F2", CultureInfo.InvariantCulture);
+
+                    averageRecoveryScore = ((double)totalRecoveryScore / totalAnimals)
+                        .ToString("F2", CultureInfo.InvariantCulture);
+                }
+
+                lblTotalAnimals.Text = totalAnimals.ToString();
+                lblAverageAge.Text = averageAge;
+                lblAverageScore.Text = averageRecoveryScore;
+
+                lblCritical.Text = criticalCount.ToString();
+                lblSerious.Text = seriousCount.ToString();
+                lblStable.Text = stableCount.ToString();
+                lblRecovering.Text = recoveringCount.ToString();
+                lblReleaseReady.Text = releaseReadyCount.ToString();
+
+                string summaryPath = Path.Combine(
+                    AppDomain.CurrentDomain.BaseDirectory,
+                    "summary.txt");
+
+                string summary =
+                    "BAOBAB RIDGE WILDLIFE REHABILITATION CENTRE" + Environment.NewLine +
+                    "ANIMAL SUMMARY REPORT" + Environment.NewLine +
+                    "Generated: " + DateTime.Now.ToString("yyyy-MM-dd HH:mm") + Environment.NewLine +
+                    "----------------------------------------" + Environment.NewLine +
+                    $"Total animals: {totalAnimals}" + Environment.NewLine +
+                    $"Average age (years): {averageAge}" + Environment.NewLine +
+                    $"Average recovery score: {averageRecoveryScore}" + Environment.NewLine +
+                    "----------------------------------------" + Environment.NewLine +
+                    "Animals per status:" + Environment.NewLine +
+                    $"Critical: {criticalCount}" + Environment.NewLine +
+                    $"Serious: {seriousCount}" + Environment.NewLine +
+                    $"Stable: {stableCount}" + Environment.NewLine +
+                    $"Recovering: {recoveringCount}" + Environment.NewLine +
+                    $"Release-Ready: {releaseReadyCount}";
+
+                // Overwrite summary.txt each time a new summary is generated.
+                File.WriteAllText(summaryPath, summary);
+
+                MessageBox.Show(
+                    "Summary report generated successfully.",
+                    "Summary Report",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Information);
+            }
+            catch (IOException)
+            {
+                MessageBox.Show(
+                    "The summary report could not be generated because a file is currently in use.",
+                    "File Error",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+            }
+            catch (UnauthorizedAccessException)
+            {
+                MessageBox.Show(
+                    "The application does not have permission to access the required file.",
+                    "Permission Error",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
             }
         }
     }
