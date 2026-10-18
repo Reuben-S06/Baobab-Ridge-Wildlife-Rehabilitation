@@ -413,6 +413,13 @@ namespace BoababRidgeWildlife
                         if (parts.Length != 7)
                             continue;
 
+                        string animalID = parts[0].Trim();
+
+                        if (animalID.Length != 7 || !animalID.StartsWith("WR-") || !animalID.Substring(3).All(char.IsDigit))
+                        {
+                            continue;
+                        }
+
                         if (!int.TryParse(parts[3].Trim(), out int age))
                             continue;
 
