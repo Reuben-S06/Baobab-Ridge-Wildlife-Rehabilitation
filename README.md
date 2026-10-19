@@ -42,7 +42,9 @@ AnimalID|Name|Species|Age|RecoveryScore|Status|HousingUnit
 Example records:
 
 WR-0001|Thabo|African Penguin|4|85|Release-Ready|Pre-Release Camp
+
 WR-0002|Naledi|Serval|3|62|Recovering|Outdoor Enclosure
+
 WR-0003|Zola|Cape Vulture|12|19|Critical|Intensive Care Unit
 
 The generated `summary.txt` report contains:
